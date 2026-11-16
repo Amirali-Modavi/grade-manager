@@ -1,59 +1,72 @@
 # Grade Manager — Student Performance Management System
 
-A full-stack student grade management application built with **Python, FastAPI, SQLite, HTML, CSS, and JavaScript**.
-
-Grade Manager allows users to manage student records, track academic performance, calculate grades, and generate performance reports through a web-based interface.
+A student grade management application built with Python, featuring a console-based version and a web-based application with a REST API.
 
 ## About This Project
 
-Grade Manager started as a console-based Python application, which I developed independently. That version used JSON for data storage and included the core grade calculation and student management functionality.
+Grade Manager is a personal project developed in two versions:
 
-I later expanded the project into a full-stack web application. During the development of the web version, I used **ChatGPT as an AI development assistant** to help with implementation, debugging, and understanding concepts related to backend development, API design, database management, and automated testing.
+- **Console Version:** Designed and implemented entirely independently by me, without AI assistance. This version helped me practise Python fundamentals, problem-solving, data structures, and program design.
+- **Web Version:** Developed with assistance from ChatGPT. I worked on understanding and implementing the backend architecture, database integration, REST API, frontend communication, debugging, and automated testing.
 
-This project represents my practical learning experience and my progress from basic Python programming to building a full-stack application.
+The project reflects my progression from fundamental Python programming to building a structured web application.
 
 ## Features
 
-- **Student Management:** Create, view, update, and delete student records.
-- **Grade Validation:** Validate student names and ensure grades are between 0 and 20.
-- **Automatic Calculations:** Calculate average scores, letter grades, and academic performance status.
-- **Performance Reports:** Generate individual student reports and overall class summaries.
-- **Search and Sorting:** Find and organize student records.
-- **Data Persistence:** Store student information in an SQLite database.
-- **Database Relationships:** Manage students and their grades using relational tables and foreign keys.
-- **JSON Migration:** Import existing student records from the previous JSON-based version.
-- **REST API:** Provide API endpoints for student management and reporting.
-- **Automated Testing:** Test backend functionality using Pytest.
+### Student Management
+- Add, update, and delete student records
+- Prevent duplicate student names
+- Validate student information and grades
+- Store multiple grades for each student
 
-## Tech Stack
+### Grade Calculation and Reporting
+- Calculate student averages
+- Convert numerical grades into letter grades
+- Determine academic performance status
+- Generate individual student reports
+- Generate class-level performance summaries
 
-| Technology | Purpose |
+### Backend and Database
+- RESTful API built with FastAPI
+- SQLite database integration
+- Data validation using Pydantic
+- Database transactions and rollback handling
+- Automatic migration from legacy JSON data
+- Foreign key constraints and cascading deletion
+
+### Frontend
+- Web-based user interface
+- Student management dashboard
+- Grade reports and performance statistics
+- Search and sorting functionality
+
+## Technology Stack
+
+| Area | Technologies |
 |---|---|
-| Python | Backend programming |
-| FastAPI | REST API development |
-| SQLite | Database |
-| Pydantic | Data validation |
-| HTML | Frontend structure |
-| CSS | Frontend styling |
-| JavaScript | Frontend functionality |
-| Pytest | Automated testing |
-| HTTPX | API testing |
+| Programming Language | Python |
+| Backend | FastAPI |
+| Database | SQLite |
+| Data Validation | Pydantic |
+| Frontend | HTML, CSS, JavaScript |
+| Testing | Pytest, HTTPX |
+| Code Coverage | pytest-cov |
 
 ## Project Structure
 
 ```text
 grade-manager/
-│
 ├── backend/
 │   ├── routes/
+│   │   ├── __init__.py
 │   │   ├── students.py
 │   │   └── reports.py
+│   ├── __init__.py
 │   ├── calculations.py
 │   ├── database.py
 │   ├── main.py
 │   ├── models.py
 │   └── storage.py
-│
 ├── frontend/
 │   ├── css/
 │   │   └── style.css
@@ -61,79 +74,67 @@ grade-manager/
 │   │   ├── app.js
 │   │   └── students.js
 │   └── index.html
-│
 ├── tests/
 │   ├── test_api.py
 │   ├── test_calculations.py
 │   ├── test_database.py
 │   ├── test_models.py
 │   └── test_storage.py
-│
 ├── screenshots/
-│   ├── dashboard.png
-│   ├── grade-reports.png
-│   ├── student-management.png
-│   └── performance.png
-│
 ├── .gitignore
 ├── requirements.txt
+├── restore_stage5_data.py
 └── README.md
 ```
 
 ## Screenshots
 
 ### Dashboard
-
 ![Dashboard](screenshots/dashboard.png)
 
-### Grade Reports
-
-![Grade Reports](screenshots/grade-reports.png)
-
 ### Student Management
-
 ![Student Management](screenshots/student-management.png)
 
-### Performance Overview
+### Grade Reports
+![Grade Reports](screenshots/grade-reports.png)
 
-![Performance Overview](screenshots/performance.png)
+### Performance Statistics
+![Performance](screenshots/performance.png)
 
 ## Installation and Setup
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Amirali-Modavi/grade-manager.git
 cd grade-manager
 ```
 
-### 2. Create a Virtual Environment
+### 2. Create a virtual environment
 
 ```bash
-python -m venv .venv
+python -m venv venv
 ```
 
-### 3. Activate the Virtual Environment
-
-**Windows PowerShell:**
-
-```powershell
-.venv\Scripts\Activate.ps1
-```
-
-**macOS / Linux:**
+Activate it on Windows:
 
 ```bash
-source .venv/bin/activate
+venv\Scripts\activate
 ```
 
-### 4. Install Dependencies
+On macOS and Linux:
+
+```bash
+source venv/bin/activate
+```
+
+### 3. Install dependencies
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-### 5. Run the Application
+### 4. Run the application
 
 ```bash
 uvicorn backend.main:app --reload
@@ -141,32 +142,39 @@ uvicorn backend.main:app --reload
 
 Open the application in your browser:
 
+```text
 http://127.0.0.1:8000
+```
 
-## API Documentation
+FastAPI interactive documentation:
 
-FastAPI automatically generates interactive API documentation.
+```text
+http://127.0.0.1:8000/docs
+```
 
-Once the application is running, visit:
+Alternative API documentation:
 
-- **Swagger UI:** http://127.0.0.1:8000/docs
-- **ReDoc:** http://127.0.0.1:8000/redoc
+```text
+http://127.0.0.1:8000/redoc
+```
 
-### Available Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
 | GET | `/api/students` | Retrieve all students |
-| POST | `/api/students` | Create a student |
+| POST | `/api/students` | Create a new student |
 | PUT | `/api/students/{student_id}` | Update a student |
 | DELETE | `/api/students/{student_id}` | Delete a student |
 | GET | `/api/reports/students` | Retrieve student reports |
 | GET | `/api/reports/summary` | Retrieve class summary |
 | GET | `/api/health` | Check API health |
 
-## Running Tests
+## Testing
 
-Run the complete test suite:
+The backend is tested using Pytest.
+
+Run the test suite:
 
 ```bash
 python -m pytest -v
@@ -180,28 +188,31 @@ python -m pytest --cov=backend --cov-report=term-missing
 
 ### Test Results
 
-- **82 tests passed**
-- **100% backend statement coverage**
-- **212 statements covered**
+| Metric | Result |
+|---|---:|
+| Total Tests | 82 |
+| Passed Tests | 82 |
+| Failed Tests | 0 |
+| Backend Test Coverage | 100% |
+| Backend Statements Covered | 212 |
+| Uncovered Backend Statements | 0 |
 
-*These results reflect the current development test run. Code coverage measures how much of the code was executed by the tests; it does not guarantee that every possible scenario or edge case has been tested. Results may change as the project evolves.*
+All 82 automated tests passed successfully, with 100% statement coverage across the backend modules.
 
-## Database
-
-The application uses SQLite for persistent data storage.
-
-The database contains separate tables for students, grades, and application metadata. Foreign key constraints maintain the relationships between student records and their grades.
-
-Existing records from the previous JSON-based version can be imported automatically during the first database initialization.
+*Coverage represents executed backend statements and does not guarantee the absence of all possible bugs.*
 
 ## Future Improvements
 
-- User authentication and authorization
-- Improved API error handling
-- Pagination and filtering
-- Database migrations
-- Deployment and production configuration
+- User authentication and role-based access
+- Improved data visualization
+- Exporting reports to PDF and Excel
+- Additional reporting and analytics features
+- Deployment to a production environment
 
----
+## Author
 
-**Built as a personal project to practice Python backend development, REST API design, relational database management, and automated testing.**
+**Amirali Modavi**
+
+GitHub: [Amirali-Modavi](https://github.com/Amirali-Modavi)
+
+Repository: [Grade Manager](https://github.com/Amirali-Modavi/grade-manager)
