@@ -131,3 +131,19 @@ td:first-child { color: #253147; font-weight: 700; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 12px; }
 .dialog-actions .primary-button { padding: 0 16px; }
 @media (max-width: 680px) { .table-tools { grid-template-columns: 1fr; } .chart-row { grid-template-columns: 82px 1fr 38px; gap: 8px; } }
+
+/* Page navigation and dedicated grade reports view */
+.nav-link { transition: color .18s ease, background-color .18s ease, box-shadow .18s ease; }
+.nav-link:not(.disabled):hover { color: #fff; background: #202f48; }
+.nav-link.active { color: #fff; background: #263957; box-shadow: inset 3px 0 #5a86f0; }
+.page-view { animation: page-enter .22s ease both; }
+@keyframes page-enter { from { opacity: .65; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.reports-welcome { margin-top: 30px; }
+.report-stats { margin-bottom: 18px; }
+.report-card { margin-top: 18px; }
+.report-table td { white-space: nowrap; }
+.report-table td:nth-child(2) { min-width: 150px; }
+@media (max-width: 680px) {
+    .report-stats { grid-template-columns: 1fr; }
+    .report-table { min-width: 650px; }
+}

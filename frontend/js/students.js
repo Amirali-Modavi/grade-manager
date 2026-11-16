@@ -15,6 +15,9 @@ const refreshButton = document.querySelector("#refresh-button");
 const searchInput = document.querySelector("#search-input");
 const sortSelect = document.querySelector("#sort-select");
 const performanceChart = document.querySelector("#performance-chart");
+const reportChart = document.querySelector("#report-chart");
+const reportsBody = document.querySelector("#reports-body");
+const reportsEmpty = document.querySelector("#reports-empty");
 const editDialog = document.querySelector("#edit-dialog");
 const editForm = document.querySelector("#edit-form");
 const editName = document.querySelector("#edit-name");
@@ -84,6 +87,69 @@ function renderChart(students) {
     }
 }
 
+function renderReports(students) {
+    reportsBody.replaceChildren();
+    reportChart.replaceChildren();
+
+    if (!students.length) {
+        reportsEmpty.hidden = false;
+        reportChart.textContent = "Add students to generate a class performance overview.";
+        document.querySelector("#report-class-average").textContent = "—";
+        document.querySelector("#report-highest").textContent = "—";
+        document.querySelector("#report-highest-name").textContent = "No student data";
+        document.querySelector("#report-at-risk").textContent = "0";
+        return;
+    }
+
+    reportsEmpty.hidden = true;
+    const ranked = [...students].sort((a, b) => b.average - a.average);
+    const classAverageValue = students.reduce((sum, student) => sum + student.average, 0) / students.length;
+    const highest = ranked[0];
+    const atRisk = students.filter((student) => student.status === "Failing").length;
+
+    document.querySelector("#report-class-average").textContent = classAverageValue.toFixed(2);
+    document.querySelector("#report-highest").textContent = highest.average.toFixed(2);
+    document.querySelector("#report-highest-name").textContent = highest.name;
+    document.querySelector("#report-at-risk").textContent = atRisk;
+
+    for (const student of ranked) {
+        const row = document.createElement("tr");
+        const initial = student.name.trim().charAt(0).toUpperCase();
+        const nameCell = makeCell("");
+        const avatar = document.createElement("span");
+        avatar.className = "student-initial";
+        avatar.textContent = initial;
+        nameCell.append(avatar, document.createTextNode(student.name));
+        row.append(
+            makeCell(`#${ranked.indexOf(student) + 1}`),
+            nameCell,
+            makeCell(String(student.grades.length)),
+            makeCell(student.average.toFixed(2)),
+            makeCell(student.letter_grade, "grade-cell"),
+            makeCell(student.status, `status-cell status-${student.status.toLowerCase()}`),
+        );
+        reportsBody.append(row);
+    }
+
+    for (const student of ranked.slice(0, 10)) {
+        const item = document.createElement("div");
+        item.className = "chart-row";
+        const label = document.createElement("span");
+        label.className = "chart-name";
+        label.textContent = student.name;
+        const track = document.createElement("div");
+        track.className = "chart-track";
+        const fill = document.createElement("div");
+        fill.className = "chart-fill";
+        fill.style.width = `${Math.max(0, Math.min(100, student.average / 20 * 100))}%`;
+        track.append(fill);
+        const value = document.createElement("strong");
+        value.textContent = student.average.toFixed(2);
+        item.append(label, track, value);
+        reportChart.append(item);
+    }
+}
+
 function renderStudents() {
     const searchTerm = searchInput.value.trim().toLocaleLowerCase();
     let visible = allStudents.filter((student) => student.name.toLocaleLowerCase().includes(searchTerm));
@@ -150,6 +216,7 @@ async function loadStudents() {
         allStudents = await studentsResponse.json();
         renderStudents();
         renderChart(allStudents);
+        renderReports(allStudents);
         document.querySelector("#api-status").classList.add("online");
         document.querySelector("#api-status").innerHTML = "<i></i> Connected";
     } catch (error) {
@@ -238,4 +305,5 @@ document.querySelector("#cancel-edit").addEventListener("click", () => editDialo
 searchInput.addEventListener("input", renderStudents);
 sortSelect.addEventListener("change", renderStudents);
 refreshButton.addEventListener("click", loadStudents);
+document.querySelector("#reports-refresh").addEventListener("click", loadStudents);
 loadStudents();

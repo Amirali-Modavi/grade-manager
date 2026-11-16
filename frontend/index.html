@@ -15,9 +15,8 @@
             </a>
             <p class="nav-label">WORKSPACE</p>
             <nav>
-                <a class="nav-link active" href="/"><span>▦</span> Dashboard</a>
-                <a class="nav-link" href="#students"><span>♙</span> Students</a>
-                <a class="nav-link" href="#students"><span>▤</span> Grade Reports</a>
+                <a class="nav-link active" href="#dashboard" data-view="dashboard" aria-current="page"><span>▦</span> Dashboard</a>
+                <a class="nav-link" href="#reports" data-view="reports"><span>▤</span> Grade Reports</a>
                 <a class="nav-link disabled" href="#settings"><span>⚙</span> Settings <small>Later</small></a>
             </nav>
             <div class="sidebar-footer">STUDENT PERFORMANCE<br><strong>MANAGEMENT</strong></div>
@@ -35,6 +34,7 @@
                 </div>
             </header>
 
+            <div id="dashboard-view" class="page-view">
             <section class="welcome-row">
                 <div>
                     <h2>Students</h2>
@@ -116,7 +116,41 @@
                 <div class="section-heading"><div><p class="eyebrow">CLASS INSIGHTS</p><h2>Student performance</h2></div></div>
                 <div id="performance-chart" class="performance-chart"><p class="muted">Add students to see the class performance chart.</p></div>
             </section>
-            <footer class="page-footer">Grade Manager <span>·</span> Stage 4 — Editing, search & rankings</footer>
+            </div>
+
+            <section id="reports-view" class="page-view reports-view" hidden>
+                <section class="welcome-row reports-welcome">
+                    <div>
+                        <h2>Grade Reports</h2>
+                        <p class="muted">Review class performance, grade distribution, and individual student results.</p>
+                    </div>
+                    <button id="reports-refresh" class="secondary-button" type="button">Refresh reports</button>
+                </section>
+
+                <section class="stats-grid report-stats" aria-label="Grade report summary">
+                    <article class="stat-card"><span class="stat-label">CLASS AVERAGE</span><strong id="report-class-average" class="stat-value">—</strong><span class="stat-note">Average of student averages</span></article>
+                    <article class="stat-card"><span class="stat-label">HIGHEST AVERAGE</span><strong id="report-highest" class="stat-value">—</strong><span id="report-highest-name" class="stat-note">Top-performing student</span></article>
+                    <article class="stat-card"><span class="stat-label">STUDENTS AT RISK</span><strong id="report-at-risk" class="stat-value">—</strong><span class="stat-note">Students with a failing status</span></article>
+                </section>
+
+                <section class="card report-card">
+                    <div class="section-heading"><div><p class="eyebrow">CLASS INSIGHTS</p><h2>Performance overview</h2></div></div>
+                    <div id="report-chart" class="performance-chart"><p class="muted">Loading performance data...</p></div>
+                </section>
+
+                <section class="card report-card">
+                    <div class="section-heading"><div><p class="eyebrow">DETAILED RESULTS</p><h2>Student grade report</h2></div></div>
+                    <div class="table-wrap">
+                        <table class="report-table">
+                            <thead><tr><th>RANK</th><th>STUDENT</th><th>NUMBER OF GRADES</th><th>AVERAGE</th><th>LETTER GRADE</th><th>STATUS</th></tr></thead>
+                            <tbody id="reports-body"></tbody>
+                        </table>
+                    </div>
+                    <div id="reports-empty" class="empty-state" hidden>No student records are available for reporting yet.</div>
+                </section>
+            </section>
+
+            <footer class="page-footer">Grade Manager <span>·</span> Student performance management</footer>
         </main>
     </div>
     <dialog id="edit-dialog" class="edit-dialog">
