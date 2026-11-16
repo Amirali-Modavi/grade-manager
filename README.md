@@ -4,6 +4,14 @@ A full-stack student grade management application built with **Python, FastAPI, 
 
 Grade Manager allows users to manage student records, track academic performance, calculate grades, and generate performance reports through a web-based interface.
 
+## About This Project
+
+Grade Manager started as a console-based Python application, which I developed independently. That version used JSON for data storage and included the core grade calculation and student management functionality.
+
+I later expanded the project into a full-stack web application. During the development of the web version, I used **ChatGPT as an AI development assistant** to help with implementation, debugging, and understanding concepts related to backend development, API design, database management, and automated testing.
+
+This project represents my practical learning experience and my progress from basic Python programming to building a full-stack application.
+
 ## Features
 
 - **Student Management:** Create, view, update, and delete student records.
@@ -38,6 +46,8 @@ grade-manager/
 │
 ├── backend/
 │   ├── routes/
+│   │   ├── students.py
+│   │   └── reports.py
 │   ├── calculations.py
 │   ├── database.py
 │   ├── main.py
@@ -46,7 +56,10 @@ grade-manager/
 │
 ├── frontend/
 │   ├── css/
+│   │   └── style.css
 │   ├── js/
+│   │   ├── app.js
+│   │   └── students.js
 │   └── index.html
 │
 ├── tests/
@@ -168,10 +181,10 @@ python -m pytest --cov=backend --cov-report=term-missing
 ### Test Results
 
 - **82 tests passed**
-- **100% backend code coverage**
+- **100% backend statement coverage**
 - **212 statements covered**
 
-*Coverage results reflect the current development test run and may change as the project evolves.*
+*These results reflect the current development test run. Code coverage measures how much of the code was executed by the tests; it does not guarantee that every possible scenario or edge case has been tested. Results may change as the project evolves.*
 
 ## Database
 
