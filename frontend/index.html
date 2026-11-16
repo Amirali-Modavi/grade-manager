@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <a class="brand" href="/">
+                <span class="brand-mark">GM</span>
+                <span>Grade Manager</span>
+            </a>
+            <p class="nav-label">WORKSPACE</p>
+            <nav>
+                <a class="nav-link active" href="/"><span>▦</span> Dashboard</a>
+                <a class="nav-link" href="#students"><span>♙</span> Students</a>
+                <a class="nav-link" href="#students"><span>▤</span> Grade Reports</a>
+                <a class="nav-link disabled" href="#settings"><span>⚙</span> Settings <small>Later</small></a>
+            </nav>
+            <div class="sidebar-footer">STUDENT PERFORMANCE<br><strong>MANAGEMENT</strong></div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">OVERVIEW</p>
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="profile">
+                    <span class="avatar">A</span>
+                    <span><strong>Administrator</strong><small>Workspace</small></span>
+                </div>
+            </header>
+
+            <section class="welcome-row">
+                <div>
+                    <h2>Students</h2>
+                    <p class="muted">Create student records and keep their grades in one place.</p>
+                </div>
+                <span id="api-status" class="api-status"><i></i> Connecting...</span>
+            </section>
+
+            <section class="stats-grid" aria-label="Student statistics">
+                <article class="stat-card">
+                    <span class="stat-label">TOTAL STUDENTS</span>
+                    <strong id="total-students" class="stat-value">—</strong>
+                    <span class="stat-note">Saved student records</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">CLASS AVERAGE</span>
+                    <strong id="class-average" class="stat-value">—</strong>
+                    <span class="stat-note">Average of student averages</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">EXCELLENT</span>
+                    <strong id="excellent-count" class="stat-value">—</strong>
+                    <span class="stat-note">Students with A grades</span>
+                </article>
+            </section>
+
+            <section class="content-grid" id="students">
+                <article class="card form-card">
+                    <div class="section-heading">
+                        <div><p class="eyebrow">NEW RECORD</p><h2>Add student</h2></div>
+                        <span class="plus-icon">＋</span>
+                    </div>
+                    <form id="student-form">
+                        <label for="student-name">Student name</label>
+                        <input id="student-name" name="name" type="text" maxlength="100"
+                               placeholder="e.g. Alex Morgan" required>
+                        <label for="student-grades">Grades <span class="label-hint">0–20</span></label>
+                        <input id="student-grades" name="grades" type="text"
+                               placeholder="e.g. 18, 19.5, 20" required>
+                        <p class="field-help">Enter at least one grade, separated by commas or spaces.</p>
+                        <button id="submit-button" class="primary-button" type="submit">
+                            <span id="button-label">Add student</span>
+                        </button>
+                        <p id="form-message" class="form-message" aria-live="polite"></p>
+                    </form>
+                </article>
+
+                <article class="card list-card">
+                    <div class="section-heading list-heading">
+                        <div><p class="eyebrow">YOUR CLASS</p><h2>Student records</h2></div>
+                        <button id="refresh-button" class="secondary-button" type="button">Refresh</button>
+                    </div>
+                    <div class="table-tools">
+                        <input id="search-input" type="search" placeholder="Search students by name..." aria-label="Search students">
+                        <select id="sort-select" aria-label="Sort students">
+                            <option value="name">Sort: Name (A–Z)</option>
+                            <option value="average-desc">Highest average</option>
+                            <option value="average-asc">Lowest average</option>
+                        </select>
+                    </div>
+                    <div id="loading" class="empty-state">Loading student records...</div>
+                    <div id="empty-state" class="empty-state" hidden>
+                        <span class="empty-icon">♙</span>
+                        <strong>No students yet</strong>
+                        <span>Add your first student using the form.</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="students-table" hidden>
+                            <thead>
+                                <tr><th>RANK</th><th>STUDENT</th><th>GRADES</th><th>AVERAGE</th><th>LETTER</th><th>STATUS</th><th>ACTION</th></tr>
+                            </thead>
+                            <tbody id="students-body"></tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
+            <section class="card chart-card">
+                <div class="section-heading"><div><p class="eyebrow">CLASS INSIGHTS</p><h2>Student performance</h2></div></div>
+                <div id="performance-chart" class="performance-chart"><p class="muted">Add students to see the class performance chart.</p></div>
+            </section>
+            <footer class="page-footer">Grade Manager <span>·</span> Stage 4 — Editing, search & rankings</footer>
+        </main>
+    </div>
+    <dialog id="edit-dialog" class="edit-dialog">
+        <form id="edit-form" method="dialog">
+            <div class="section-heading"><div><p class="eyebrow">UPDATE RECORD</p><h2>Edit student</h2></div><button id="close-dialog" class="secondary-button" type="button">✕</button></div>
+            <label for="edit-name">Student name</label>
+            <input id="edit-name" type="text" maxlength="100" required>
+            <label for="edit-grades">Grades <span class="label-hint">0–20</span></label>
+            <input id="edit-grades" type="text" required>
+            <p class="field-help">Change the name or add/remove grades. Separate grades with commas or spaces.</p>
+            <p id="edit-message" class="form-message" aria-live="polite"></p>
+            <div class="dialog-actions"><button id="cancel-edit" class="secondary-button" type="button">Cancel</button><button id="save-edit" class="primary-button" type="submit">Save changes</button></div>
+        </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/js/app.js"></script>
+    <script src="/js/students.js"></script>
+</body>
+</html>
