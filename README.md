@@ -56,27 +56,51 @@ grade-manager/
 │   ├── test_models.py
 │   └── test_storage.py
 │
+├── screenshots/
+│   ├── dashboard.png
+│   ├── grade-reports.png
+│   ├── student-management.png
+│   └── performance.png
+│
 ├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
 
+## Screenshots
+
+### Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### Grade Reports
+
+![Grade Reports](screenshots/grade-reports.png)
+
+### Student Management
+
+![Student Management](screenshots/student-management.png)
+
+### Performance Overview
+
+![Performance Overview](screenshots/performance.png)
+
 ## Installation and Setup
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
-git clone YOUR_REPOSITORY_URL
+git clone https://github.com/Amirali-Modavi/grade-manager.git
 cd grade-manager
 ```
 
-### 2. Create a virtual environment
+### 2. Create a Virtual Environment
 
 ```bash
 python -m venv .venv
 ```
 
-### 3. Activate the virtual environment
+### 3. Activate the Virtual Environment
 
 **Windows PowerShell:**
 
@@ -84,13 +108,19 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
-### 4. Install dependencies
+**macOS / Linux:**
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Install Dependencies
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-### 5. Run the application
+### 5. Run the Application
 
 ```bash
 uvicorn backend.main:app --reload
@@ -106,7 +136,8 @@ FastAPI automatically generates interactive API documentation.
 
 Once the application is running, visit:
 
-http://127.0.0.1:8000/docs
+- **Swagger UI:** http://127.0.0.1:8000/docs
+- **ReDoc:** http://127.0.0.1:8000/redoc
 
 ### Available Endpoints
 
@@ -146,7 +177,7 @@ python -m pytest --cov=backend --cov-report=term-missing
 
 The application uses SQLite for persistent data storage.
 
-The database contains separate tables for students, grades, and application metadata. Foreign key constraints maintain the relationship between student records and their grades.
+The database contains separate tables for students, grades, and application metadata. Foreign key constraints maintain the relationships between student records and their grades.
 
 Existing records from the previous JSON-based version can be imported automatically during the first database initialization.
 
