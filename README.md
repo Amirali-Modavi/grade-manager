@@ -35,10 +35,15 @@ The project reflects my progression from fundamental Python programming to build
 - Foreign key constraints and cascading deletion
 
 ### Frontend
-- Web-based user interface
-- Student management dashboard
-- Grade reports and performance statistics
-- Search and sorting functionality
+- Web-based student management dashboard and grade reports
+- Shared competition ranking across dashboard and reports (1, 2, 2, 4)
+- Search and five sorting options without changing a student's rank
+- Shared grade/status badges and compact grade chips with full-list tooltips
+- Performance chart with status-based colors, a 0–20 scale, and a passing threshold
+- At-risk student summary with names
+- Responsive stacked student cards on screens below 768px
+- Automatic data refresh after create, edit, delete, and page navigation
+- Keyboard focus indicators and accessible form/table labels
 
 ## Technology Stack
 

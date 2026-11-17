@@ -1,36 +1,39 @@
-async function checkBackendConnection() {
-    const status = document.querySelector("#api-status");
-    const stat = document.querySelector("#api-stat");
+const apiStatus = document.querySelector("#api-status");
+const pageLinks = [...document.querySelectorAll(".nav-link[data-view]")];
+const dashboardView = document.querySelector("#dashboard-view");
+const reportsView = document.querySelector("#reports-view");
+const pageTitle = document.querySelector("#page-title");
+let currentView = null;
 
+function setApiStatus(state, message) {
+    if (!apiStatus) return;
+    apiStatus.className = `api-status ${state}`.trim();
+    apiStatus.replaceChildren();
+    const indicator = document.createElement("i");
+    indicator.setAttribute("aria-hidden", "true");
+    apiStatus.append(indicator, document.createTextNode(message));
+}
+
+async function checkBackendConnection() {
     try {
         const response = await fetch("/api/health");
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         await response.json();
-        status.className = "api-status online";
-        status.innerHTML = "<i></i> Backend connected";
-        if (stat) stat.textContent = "Online";
+        setApiStatus("online", "Backend connected");
     } catch (error) {
-        status.className = "api-status offline";
-        status.innerHTML = "<i></i> API unavailable";
-        if (stat) stat.textContent = "Offline";
+        setApiStatus("offline", "API unavailable");
         console.error("API connection error:", error);
     }
 }
 
-checkBackendConnection();
-
-
-// Simple client-side navigation between the dashboard and reports views.
-const pageLinks = [...document.querySelectorAll(".nav-link[data-view]")];
-const dashboardView = document.querySelector("#dashboard-view");
-const reportsView = document.querySelector("#reports-view");
-const pageTitle = document.querySelector(".topbar h1");
-const pageEyebrow = document.querySelector(".topbar .eyebrow");
-
 function showPage(view, updateHistory = true) {
     const selectedView = view === "reports" ? "reports" : "dashboard";
+    const viewChanged = selectedView !== currentView;
+    currentView = selectedView;
+
     dashboardView.hidden = selectedView !== "dashboard";
     reportsView.hidden = selectedView !== "reports";
+    pageTitle.textContent = selectedView === "reports" ? "Grade reports" : "Dashboard";
 
     pageLinks.forEach((link) => {
         const isActive = link.dataset.view === selectedView;
@@ -39,15 +42,12 @@ function showPage(view, updateHistory = true) {
         else link.removeAttribute("aria-current");
     });
 
-    pageTitle.textContent = selectedView === "reports" ? "Grade Reports" : "Dashboard";
-    pageEyebrow.textContent = selectedView === "reports" ? "ACADEMIC PERFORMANCE" : "OVERVIEW";
-
     if (updateHistory && window.location.hash !== `#${selectedView}`) {
         window.history.pushState({ view: selectedView }, "", `#${selectedView}`);
     }
-    if (selectedView === "reports" && typeof loadStudents === "function") {
-        loadStudents();
-    }
+
+    // Refresh the shared student data whenever the user changes sections.
+    if (viewChanged && typeof loadStudents === "function") loadStudents();
 }
 
 pageLinks.forEach((link) => {
@@ -59,4 +59,6 @@ pageLinks.forEach((link) => {
 
 window.addEventListener("popstate", () => showPage(window.location.hash.slice(1), false));
 window.addEventListener("hashchange", () => showPage(window.location.hash.slice(1), false));
+
+checkBackendConnection();
 showPage(window.location.hash.slice(1) || "dashboard", false);
