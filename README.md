@@ -88,14 +88,16 @@ grade-manager/
 ### Dashboard
 ![Dashboard](screenshots/dashboard.png)
 
-### Grade Reports
-![Grade Reports](screenshots/grade-reports.png)
+### Student Management
+![Student Management](screenshots/student-management.png)
 
 ### Performance Statistics
 ![Performance Statistics](screenshots/performance.png)
 
-### Student Management
-![Student Management](screenshots/student-management.png)
+### Grade Reports
+![Grade Reports](screenshots/grade-reports.png)
+
+
 
 ## Installation and Setup
 
