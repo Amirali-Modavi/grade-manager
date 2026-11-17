@@ -4,19 +4,25 @@ A web-based student grade management application built with Python, FastAPI, SQL
 
 ## About This Project
 
-Grade Manager began as a standalone console-based Python prototype. That original prototype is not included in this repository; this repository contains the web application and its REST API.
+Grade Manager is a web-based student performance management system designed to provide a centralized and efficient way to manage student records, track academic progress, and analyze class performance.
 
-The project demonstrates the progression from Python fundamentals to a structured full-stack application with persistent storage and automated tests.
+Built with Python, FastAPI, SQLite, HTML, CSS, and JavaScript, the application combines a structured backend, RESTful API, and interactive frontend to provide a complete student management experience.
+
+The system allows users to manage student information and grades, calculate academic averages, generate individual performance reports, and view class-wide statistics through a responsive dashboard.
+
+On the backend, FastAPI handles application logic and API requests, while SQLite provides persistent data storage. Pydantic is used for data validation, and database constraints help maintain data integrity. The frontend communicates with the backend through API endpoints and provides interactive features for managing records, searching and sorting students, and viewing performance statistics.
+
+Additional attention has been given to data consistency, Unicode-aware name validation, database migration, error handling, accessibility, and automated testing.
+
+The project initially started as a small console-based Python application and gradually evolved into the web-based system presented in this repository.
 
 ## Learning Journey & AI Assistance
 
-Grade Manager started as a personal learning project aimed at strengthening my Python programming skills and gaining practical experience in software development. I began with a console-based Python application and later developed a web-based version.
+Grade Manager is a personal learning project developed to strengthen my Python programming skills and gain practical experience in software development.
 
-Throughout the development process, I used ChatGPT and Claude to review, refactor, and improve the codebase. Their assistance included rewriting parts of the code in a cleaner and more organized style, improving readability and consistency, while largely preserving the existing project structure and overall logic.
+During development, I used ChatGPT and Claude as supporting tools for code review, refactoring, and problem-solving. I reviewed suggested changes, tested functionality, and debugged issues to improve my understanding of the codebase.
 
-I also reviewed the suggested changes, tested functionality, debugged issues, and used the process as an opportunity to better understand the codebase and develop my programming skills.
-
-The project reflects my own learning process, development efforts, and growing understanding of software development. AI assistance was part of that process, but understanding the code, reviewing changes, testing functionality, and learning from mistakes remained essential parts of the experience.
+The project reflects my development efforts and ongoing learning process, with AI serving as an additional development aid.
 
 ## Features
 
