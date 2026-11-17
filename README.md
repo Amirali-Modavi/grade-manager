@@ -10,11 +10,11 @@ The project demonstrates the progression from Python fundamentals to a structure
 
 ## Learning Journey & AI Assistance
 
-Grade Manager is a personal learning project that I developed to strengthen my Python programming skills and gain practical experience in building a complete web application.
+Grade Manager started as a personal learning project aimed at strengthening my Python programming skills and gaining practical experience in software development. I began with a console-based Python application and later developed a web-based version.
 
-I started with a basic console-based Python implementation and gradually expanded the project into a full-stack application using FastAPI, SQLite, and JavaScript.
+Throughout the development process, I used ChatGPT and Claude to review, refactor, and improve the codebase. Their assistance included rewriting parts of the code in a cleaner and more organized style, improving readability and consistency, while largely preserving the existing project structure and overall logic.
 
-Throughout this learning process, I used ChatGPT as a supplementary tool to help review and refactor code, debug issues, improve project structure, and explore better implementation approaches.
+I also reviewed the suggested changes, tested functionality, debugged issues, and used the process as an opportunity to better understand the codebase and develop my programming skills.
 
 The project reflects my own learning process, development efforts, and growing understanding of software development. AI assistance was part of that process, but understanding the code, reviewing changes, testing functionality, and learning from mistakes remained essential parts of the experience.
 
