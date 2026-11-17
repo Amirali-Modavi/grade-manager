@@ -28,6 +28,7 @@ During development, I used ChatGPT and Claude as supporting tools for code revie
 
 ### Grade Calculation and Reporting
 - Calculate student averages and consistently classify the rounded, displayed value
+- All grades are measured on a 0–20 scale, where 20 represents the highest possible score
 - Convert numerical grades into letter grades and academic performance statuses
 - Use one passing threshold for grade classification and the performance chart
 - Generate individual student reports and class-level performance summaries
