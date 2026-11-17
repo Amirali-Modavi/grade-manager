@@ -64,36 +64,47 @@ During development, I used ChatGPT and Claude as supporting tools for code revie
 
 ```text
 grade-manager/
+│
 ├── .github/
-│   ├── workflows/
-│   │   ├── test.yml
+│   └── workflows/
+│       └── test.yml
+│
 ├── backend/
 │   ├── routes/
 │   │   ├── __init__.py
 │   │   ├── students.py
 │   │   └── reports.py
+│   │
 │   ├── __init__.py
 │   ├── calculations.py
 │   ├── database.py
 │   ├── main.py
 │   ├── models.py
 │   └── names.py
+│
 ├── frontend/
-│   ├── css/style.css
+│   ├── css/
+│   │   └── style.css
+│   │
 │   ├── js/
 │   │   ├── app.js
 │   │   └── students.js
+│   │
 │   └── index.html
+│
 ├── scripts/
 │   ├── __init__.py
 │   └── restore_from_backup.py
+│
 ├── tests/
 │   ├── test_api.py
 │   ├── test_calculations.py
 │   ├── test_database.py
 │   ├── test_models.py
 │   └── test_names.py
+│
 ├── screenshots/
+│
 ├── .gitignore
 ├── requirements.txt
 ├── README.md
