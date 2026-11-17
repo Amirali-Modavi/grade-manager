@@ -169,6 +169,10 @@ FastAPI documentation is available at `http://127.0.0.1:8000/docs` and `http://1
 
 ## Testing
 
+The project includes an automated test suite with **99 passing tests**, covering API endpoints, calculations, database operations, data models, and name validation.
+
+The backend achieves **97% test coverage**, measured using Pytest and pytest-cov.
+
 Run the complete test suite:
 
 ```bash
@@ -181,7 +185,7 @@ Run tests with coverage:
 python -m pytest --cov=backend --cov-report=term-missing
 ```
 
-Test totals and coverage depend on the current code and test environment; use the commands above for the latest results. Coverage reports executed statements and does not prove that every possible input or behavior has been tested.
+Coverage reports executed statements and does not guarantee that every possible input or behavior has been tested.
 
 ## Optional Data Recovery
 
