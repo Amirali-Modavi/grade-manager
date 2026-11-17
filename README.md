@@ -93,6 +93,7 @@ grade-manager/
 ├── .gitignore
 ├── requirements.txt
 └── README.md
+└── LICENSE
 ```
 
 ## Screenshots
