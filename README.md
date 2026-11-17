@@ -4,7 +4,19 @@ A web-based student grade management application built with Python, FastAPI, SQL
 
 ## About This Project
 
-Grade Manager began as a standalone console-based Python prototype. That original prototype is not included in this repository; this repository contains the web application and its REST API. The project demonstrates the progression from Python fundamentals to a structured full-stack application with persistent storage and automated tests.
+Grade Manager began as a standalone console-based Python prototype. That original prototype is not included in this repository; this repository contains the web application and its REST API.
+
+The project demonstrates the progression from Python fundamentals to a structured full-stack application with persistent storage and automated tests.
+
+## Learning Journey & AI Assistance
+
+Grade Manager is a personal learning project that I developed to strengthen my Python programming skills and gain practical experience in building a complete web application.
+
+I started with a basic console-based Python implementation and gradually expanded the project into a full-stack application using FastAPI, SQLite, and JavaScript.
+
+Throughout this learning process, I used ChatGPT as a supplementary tool to help review and refactor code, debug issues, improve project structure, and explore better implementation approaches.
+
+The project reflects my own learning process, development efforts, and growing understanding of software development. AI assistance was part of that process, but understanding the code, reviewing changes, testing functionality, and learning from mistakes remained essential parts of the experience.
 
 ## Features
 
@@ -96,8 +108,6 @@ grade-manager/
 
 ### Grade Reports
 ![Grade Reports](screenshots/grade-reports.png)
-
-
 
 ## Installation and Setup
 
