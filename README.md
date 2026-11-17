@@ -92,7 +92,7 @@ grade-manager/
 ├── screenshots/
 ├── .gitignore
 ├── requirements.txt
-└── README.md
+├── README.md
 └── LICENSE
 ```
 
