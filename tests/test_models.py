@@ -1,3 +1,4 @@
+import math
 
 import pytest
 from pydantic import ValidationError
@@ -6,22 +7,14 @@ from backend.models import StudentCreate, StudentUpdate
 
 
 def test_create_student_with_valid_data():
-    student = StudentCreate(
-        name="Amirali",
-        grades=[18, 19, 20]
-    )
-
+    student = StudentCreate(name="Amirali", grades=[18, 19, 20])
     assert student.name == "Amirali"
     assert student.grades == [18, 19, 20]
 
 
-def test_student_name_is_stripped():
-    student = StudentCreate(
-        name="  Amirali  ",
-        grades=[18, 19]
-    )
-
-    assert student.name == "Amirali"
+def test_student_name_is_stripped_and_whitespace_collapsed():
+    student = StudentCreate(name="  Amirali   Modavi  ", grades=[18, 19])
+    assert student.name == "Amirali Modavi"
 
 
 @pytest.mark.parametrize("name", ["", "   "])
@@ -40,26 +33,23 @@ def test_empty_grades_are_rejected():
         StudentCreate(name="Amirali", grades=[])
 
 
-@pytest.mark.parametrize("grade", [-1, 20.1, 25])
+@pytest.mark.parametrize("grade", [-1, 20.1, 25, math.inf, -math.inf, math.nan])
 def test_invalid_grades_are_rejected(grade):
     with pytest.raises(ValidationError):
         StudentCreate(name="Amirali", grades=[18, grade])
 
 
 def test_valid_boundary_grades():
-    student = StudentCreate(
-        name="Amirali",
-        grades=[0, 20]
-    )
-
+    student = StudentCreate(name="Amirali", grades=[0, 20])
     assert student.grades == [0, 20]
 
 
 def test_student_update_with_valid_data():
-    student = StudentUpdate(
-        name="Ali",
-        grades=[15, 18]
-    )
-
+    student = StudentUpdate(name="Ali", grades=[15, 18])
     assert student.name == "Ali"
     assert student.grades == [15, 18]
+
+
+def test_name_normalization_handles_persian_and_arabic_letters():
+    student = StudentCreate(name="علي كاظم", grades=[18])
+    assert student.name == "علی کاظم"

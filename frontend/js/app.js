@@ -46,8 +46,12 @@ function showPage(view, updateHistory = true) {
         window.history.pushState({ view: selectedView }, "", `#${selectedView}`);
     }
 
-    // Refresh the shared student data whenever the user changes sections.
-    if (viewChanged && typeof loadStudents === "function") loadStudents();
+    // Notify data modules without depending on their script load order.
+    if (viewChanged) {
+        window.dispatchEvent(new CustomEvent("grade-manager:view-change", {
+            detail: { view: selectedView },
+        }));
+    }
 }
 
 pageLinks.forEach((link) => {

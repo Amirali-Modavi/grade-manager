@@ -63,8 +63,8 @@
                                    placeholder="e.g. Alex Morgan" autocomplete="off" required>
                             <label for="student-grades">Grades <span class="label-hint">0–20</span></label>
                             <input id="student-grades" name="grades" type="text"
-                                   placeholder="e.g. 18, 19.5, 20" inputmode="decimal" required>
-                            <p class="field-help">Enter one or more grades, separated by commas or spaces.</p>
+                                   placeholder="e.g. 18, 19.5, 20 or ۱۸٫۵؛ ۱۹؛ ۲۰" inputmode="decimal" required>
+                            <p class="field-help">Enter grades separated by spaces, semicolons, or commas followed by spaces. Decimal commas and Persian digits are supported.</p>
                             <button id="submit-button" class="primary-button" type="submit">
                                 <span id="button-label">Add student</span>
                             </button>
@@ -190,7 +190,7 @@
             <input id="edit-name" type="text" maxlength="100" autocomplete="off" required>
             <label for="edit-grades">Grades <span class="label-hint">0–20</span></label>
             <input id="edit-grades" type="text" inputmode="decimal" required>
-            <p class="field-help">Change the name or add/remove grades. Separate grades with commas or spaces.</p>
+            <p class="field-help">Change the name or add/remove grades. Separate grades with spaces or semicolons; decimal commas and Persian digits are supported.</p>
             <p id="edit-message" class="form-message" role="alert" aria-live="polite" hidden></p>
             <div class="dialog-actions">
                 <button id="cancel-edit" class="secondary-button" type="button">Cancel</button>

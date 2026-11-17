@@ -294,3 +294,130 @@ def test_database_migration_rejects_non_list_json(
 
     with pytest.raises(RuntimeError, match="JSON list"):
         database.initialize_database()
+
+
+def test_migration_rejects_invalid_and_duplicate_records_as_whole_rows(
+    monkeypatch, tmp_path, caplog
+):
+    database_file = tmp_path / "migration.db"
+    legacy_file = tmp_path / "students.json"
+    legacy_file.write_text(
+        json.dumps([
+            {"id": "good-1", "name": "Ali", "grades": [18, 19]},
+            {"id": "duplicate", "name": "ali", "grades": [20]},
+            {"id": "bad-grade", "name": "Bad Grade", "grades": [18, 25]},
+            {"id": "good-2", "name": "Sara", "grades": [17]},
+        ]),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(database, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(database, "LEGACY_JSON_FILE", legacy_file)
+
+    database.initialize_database()
+
+    assert database.get_all_students() == [
+        {"id": "good-1", "name": "Ali", "grades": [18.0, 19.0]},
+        {"id": "good-2", "name": "Sara", "grades": [17.0]},
+    ]
+    assert "Rejected legacy student JSON record #2" in caplog.text
+    assert "Rejected legacy student JSON record #3" in caplog.text
+
+
+def test_migration_rejects_record_with_missing_or_malformed_fields(
+    monkeypatch, tmp_path, caplog
+):
+    database_file = tmp_path / "migration.db"
+    legacy_file = tmp_path / "students.json"
+    legacy_file.write_text(
+        json.dumps([
+            {"id": "missing-grades", "name": "No Grades"},
+            {"id": "empty-name", "name": "  ", "grades": [18]},
+            {"id": "valid", "name": "Valid", "grades": [18]},
+        ]),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(database, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(database, "LEGACY_JSON_FILE", legacy_file)
+
+    database.initialize_database()
+
+    assert [student["id"] for student in database.get_all_students()] == ["valid"]
+    assert "Rejected legacy student JSON record #1" in caplog.text
+    assert "Rejected legacy student JSON record #2" in caplog.text
+
+
+def test_old_database_schema_is_upgraded_and_unicode_conflicts_preserved(
+    monkeypatch, tmp_path, caplog
+):
+    database_file = tmp_path / "old-schema.db"
+    legacy_file = tmp_path / "students.json"
+    connection = sqlite3.connect(database_file)
+    connection.executescript(
+        """CREATE TABLE students (
+               id TEXT PRIMARY KEY,
+               name TEXT NOT NULL COLLATE NOCASE UNIQUE
+           );
+           CREATE TABLE grades (
+               id INTEGER PRIMARY KEY AUTOINCREMENT,
+               student_id TEXT NOT NULL,
+               grade REAL NOT NULL,
+               position INTEGER NOT NULL,
+               FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+               UNIQUE(student_id, position)
+           );
+           CREATE TABLE app_metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+           INSERT INTO students (id, name) VALUES ('1', 'Élise'), ('2', 'élise');
+           INSERT INTO grades (student_id, grade, position) VALUES ('1', 18, 0), ('2', 19, 0);
+        """
+    )
+    connection.commit()
+    connection.close()
+    monkeypatch.setattr(database, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(database, "LEGACY_JSON_FILE", legacy_file)
+
+    database.initialize_database()
+
+    assert len(database.get_all_students()) == 2
+    with database.get_connection() as connection:
+        keys = connection.execute("SELECT name_key FROM students ORDER BY id").fetchall()
+    assert sum(row["name_key"] is None for row in keys) == 1
+    assert "Existing duplicate student name" in caplog.text
+    with pytest.raises(sqlite3.IntegrityError):
+        database.create_student_record("3", "ÉLISE", [20])
+
+
+def test_get_all_students_reads_records_and_grades_from_join(setup_database):
+    database.create_student_record("one", "Ali", [18, 19])
+    database.create_student_record("two", "Sara", [16])
+    students = database.get_all_students()
+    assert [(item["name"], item["grades"]) for item in students] == [
+        ("Ali", [18.0, 19.0]),
+        ("Sara", [16.0]),
+    ]
+
+
+def test_migration_rolls_back_a_partially_inserted_student(
+    monkeypatch, tmp_path, caplog
+):
+    database_file = tmp_path / "migration-savepoint.db"
+    legacy_file = tmp_path / "students.json"
+    monkeypatch.setattr(database, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(database, "LEGACY_JSON_FILE", legacy_file)
+
+    database.initialize_database()
+    with database.get_connection() as connection:
+        connection.execute("DELETE FROM app_metadata WHERE key = 'json_migration_done'")
+        connection.execute(
+            """CREATE TRIGGER reject_selected_grade
+               BEFORE INSERT ON grades WHEN NEW.grade = 19
+               BEGIN SELECT RAISE(ABORT, 'test trigger rejection'); END"""
+        )
+    legacy_file.write_text(
+        json.dumps([{"id": "partial", "name": "Partial", "grades": [18, 19]}]),
+        encoding="utf-8",
+    )
+
+    database.initialize_database()
+
+    assert database.get_all_students() == []
+    assert "The entire record was skipped" in caplog.text

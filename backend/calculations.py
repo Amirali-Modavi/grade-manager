@@ -1,10 +1,20 @@
-"""Grade calculations matching the original CLI Grade Manager rules."""
+"""Grade calculations shared by reports and the performance chart."""
+from decimal import Decimal, ROUND_HALF_UP
+
+PASSING_THRESHOLD = 12.0
+AVERAGE_DECIMAL_PLACES = 2
 
 
 def calculate_average(grades: list[float]) -> float:
     if not grades:
         raise ValueError("Cannot calculate an average without grades.")
     return sum(grades) / len(grades)
+
+
+def round_average(average: float) -> float:
+    """Round for display and classification using conventional half-up rounding."""
+    quantum = Decimal("1").scaleb(-AVERAGE_DECIMAL_PLACES)
+    return float(Decimal(str(average)).quantize(quantum, rounding=ROUND_HALF_UP))
 
 
 def calculate_letter_grade(average: float) -> str:
@@ -30,7 +40,7 @@ def calculate_letter_grade(average: float) -> str:
         return "D+"
     elif average >= 12.6:
         return "D"
-    elif average >= 12:
+    elif average >= PASSING_THRESHOLD:
         return "D-"
     return "F"
 
@@ -48,11 +58,11 @@ def calculate_grade_status(letter_grade: str) -> str:
 
 
 def build_student_report(student: dict) -> dict:
-    average = calculate_average(student["grades"])
+    average = round_average(calculate_average(student["grades"]))
     letter_grade = calculate_letter_grade(average)
     return {
         **student,
-        "average": round(average, 2),
+        "average": average,
         "letter_grade": letter_grade,
         "status": calculate_grade_status(letter_grade),
     }

@@ -58,12 +58,50 @@ function clearMessage(element) {
     element.hidden = true;
 }
 
+function normalizeGradeInput(rawValue) {
+    const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
+    const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
+    return Array.from(String(rawValue), (character) => {
+        const persianIndex = persianDigits.indexOf(character);
+        if (persianIndex !== -1) return String(persianIndex);
+        const arabicIndex = arabicDigits.indexOf(character);
+        if (arabicIndex !== -1) return String(arabicIndex);
+        if (character === "٫") return ".";
+        if (character === "،") return ",";
+        if (character === "−") return "-";
+        return character;
+    }).join("");
+}
+
 function parseGrades(rawValue) {
-    const parts = rawValue.trim().split(/[\s,]+/).filter(Boolean);
-    if (!parts.length) throw new Error("Enter at least one grade.");
-    const grades = parts.map(Number);
-    if (grades.some((grade) => !Number.isFinite(grade))) {
-        throw new Error("Grades must contain numbers only.");
+    const normalized = normalizeGradeInput(rawValue).trim();
+    if (!normalized) throw new Error("Enter at least one grade.");
+
+    // A comma followed by a space is a list separator. A comma inside a
+    // token is a decimal separator, so both `18, 19.5` and `18,5` work.
+    let parts;
+    if (/[\s;؛]/.test(normalized)) {
+        parts = normalized.split(/(?:[\s;؛]+|[,،]\s+)/).filter(Boolean);
+    } else {
+        const commaCount = (normalized.match(/[,،]/g) || []).length;
+        if (commaCount === 1 && !normalized.includes(".")) {
+            // A single comma without surrounding whitespace is a decimal mark.
+            parts = [normalized];
+        } else if (commaCount > 0) {
+            // Multiple commas, or comma-separated values with dot decimals,
+            // are treated as a list. Use spaces/semicolons for decimal-comma lists.
+            parts = normalized.split(/[,،]/).filter(Boolean);
+        } else {
+            parts = [normalized];
+        }
+    }
+
+    const grades = parts.map((part) => {
+        if (!/^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)$/.test(part)) return Number.NaN;
+        return Number(part.replace(",", "."));
+    });
+    if (!grades.length || grades.some((grade) => !Number.isFinite(grade))) {
+        throw new Error("Enter valid numbers. Use spaces, semicolons, or commas followed by spaces between grades; use a comma or period for decimals.");
     }
     if (grades.some((grade) => grade < 0 || grade > 20)) {
         throw new Error("Every grade must be between 0 and 20.");
@@ -192,12 +230,6 @@ function createStudentRow(student, rank, includeActions = false) {
     return row;
 }
 
-async function loadSummary() {
-    const response = await fetch("/api/reports/summary");
-    if (!response.ok) throw new Error("Could not load class summary.");
-    return response.json();
-}
-
 function renderStudents() {
     const searchTerm = searchInput.value.trim().toLocaleLowerCase();
     const { ranks } = calculateRanks(allStudents);
@@ -240,7 +272,7 @@ function renderStudents() {
 
 }
 
-function renderPerformanceChart(students) {
+function renderPerformanceChart(students, passingThreshold) {
     reportChart.replaceChildren();
     if (!students.length) {
         const note = document.createElement("p");
@@ -254,21 +286,22 @@ function renderPerformanceChart(students) {
     const chart = document.createElement("div");
     chart.className = "chart-content";
 
+    const note = document.createElement("p");
+    note.className = "chart-note";
+    note.textContent = students.length > 12
+        ? `Showing the top 12 of ${students.length} students by average. Passing threshold: ${passingThreshold}/20.`
+        : `Showing all ${students.length} students. Passing threshold: ${passingThreshold}/20.`;
+    chart.append(note);
+
     const axisRow = document.createElement("div");
     axisRow.className = "chart-axis-row";
     const axisSpacer = document.createElement("span");
     axisSpacer.setAttribute("aria-hidden", "true");
     const axis = document.createElement("div");
     axis.className = "chart-axis";
-    ["0", "5", "10", "15", "20"].forEach((value, index) => {
+    ["0", "5", "10", "15", "20"].forEach((value) => {
         const tick = document.createElement("span");
         tick.textContent = value;
-        if (index === 2) {
-            tick.className = "pass-tick";
-            const passLabel = document.createElement("b");
-            passLabel.textContent = "Pass";
-            tick.append(passLabel);
-        }
         axis.append(tick);
     });
     const axisValueSpacer = document.createElement("span");
@@ -287,7 +320,8 @@ function renderPerformanceChart(students) {
         const track = document.createElement("div");
         track.className = "chart-track";
         track.setAttribute("role", "img");
-        track.setAttribute("aria-label", `${student.name}: ${Number(student.average).toFixed(2)} out of 20, ${student.status}`);
+        track.setAttribute("aria-label", `${student.name}: ${Number(student.average).toFixed(2)} out of 20, ${student.status}; passing threshold ${passingThreshold}`);
+        track.style.setProperty("--passing-position", `${Number(passingThreshold) / 20 * 100}%`);
         const fill = document.createElement("div");
         fill.className = `chart-fill status-${student.status.toLowerCase()}`;
         fill.style.width = `${Math.max(0, Math.min(100, Number(student.average) / 20 * 100))}%`;
@@ -324,7 +358,7 @@ function renderRiskCard(students) {
     });
 }
 
-function renderReports(students) {
+function renderReports(students, passingThreshold) {
     reportsBody.replaceChildren();
     const { ranked, ranks } = calculateRanks(students);
 
@@ -335,7 +369,7 @@ function renderReports(students) {
         document.querySelector("#report-highest").textContent = "—";
         document.querySelector("#report-highest-name").textContent = "No student data";
         renderRiskCard([]);
-        renderPerformanceChart([]);
+        renderPerformanceChart([], passingThreshold);
         return;
     }
 
@@ -352,7 +386,7 @@ function renderReports(students) {
     ranked.forEach((student) => {
         reportsBody.append(createStudentRow(student, ranks.get(student.id)));
     });
-    renderPerformanceChart(students);
+    renderPerformanceChart(students, passingThreshold);
 }
 
 async function loadStudents() {
@@ -361,12 +395,10 @@ async function loadStudents() {
     emptyState.hidden = true;
 
     try {
-        const [studentsResponse, summary] = await Promise.all([
-            fetch("/api/reports/students"),
-            loadSummary(),
-        ]);
-        if (!studentsResponse.ok) throw new Error("Could not load students.");
-        const students = await studentsResponse.json();
+        const response = await fetch("/api/reports/overview");
+        if (!response.ok) throw new Error("Could not load student reports.");
+        const overview = await response.json();
+        const { students, summary } = overview;
         if (requestVersion !== loadVersion) return;
 
         totalStudents.textContent = summary.total_students;
@@ -374,7 +406,7 @@ async function loadStudents() {
         excellentCount.textContent = summary.excellent_count;
         allStudents = students;
         renderStudents();
-        renderReports(allStudents);
+        renderReports(allStudents, Number(summary.passing_threshold));
         setApiStatus("online", "Backend connected");
     } catch (error) {
         if (requestVersion !== loadVersion) return;
@@ -498,4 +530,5 @@ document.querySelector("#close-dialog").addEventListener("click", () => editDial
 document.querySelector("#cancel-edit").addEventListener("click", () => editDialog.close());
 searchInput.addEventListener("input", renderStudents);
 sortSelect.addEventListener("change", renderStudents);
+window.addEventListener("grade-manager:view-change", () => loadStudents());
 loadStudents();

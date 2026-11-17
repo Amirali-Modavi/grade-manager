@@ -1,61 +1,51 @@
 # Grade Manager — Student Performance Management System
 
-A student grade management application built with Python, featuring a console-based version and a web-based application with a REST API.
+A web-based student grade management application built with Python, FastAPI, SQLite, HTML, CSS, and JavaScript.
 
 ## About This Project
 
-Grade Manager is a personal project developed in two versions:
-
-- **Console Version:** Designed and implemented entirely independently by me, without AI assistance. This version helped me practise Python fundamentals, problem-solving, data structures, and program design.
-- **Web Version:** Developed with assistance from ChatGPT. I worked on understanding and implementing the backend architecture, database integration, REST API, frontend communication, debugging, and automated testing.
-
-The project reflects my progression from fundamental Python programming to building a structured web application.
+Grade Manager began as a standalone console-based Python prototype. That original prototype is not included in this repository; this repository contains the web application and its REST API. The project demonstrates the progression from Python fundamentals to a structured full-stack application with persistent storage and automated tests.
 
 ## Features
 
 ### Student Management
-- Add, update, and delete student records
-- Prevent duplicate student names
-- Validate student information and grades
+- Add, update, search, sort, and delete student records
+- Prevent duplicate names using Unicode-aware normalization, including Persian and Arabic letter variants
+- Validate student names and grades, including decimal-comma and Persian-digit input in the web form
 - Store multiple grades for each student
 
 ### Grade Calculation and Reporting
-- Calculate student averages
-- Convert numerical grades into letter grades
-- Determine academic performance status
-- Generate individual student reports
-- Generate class-level performance summaries
+- Calculate student averages and consistently classify the rounded, displayed value
+- Convert numerical grades into letter grades and academic performance statuses
+- Use one passing threshold for grade classification and the performance chart
+- Generate individual student reports and class-level performance summaries
+- Display the top 12 students in the performance chart and explicitly state when the chart is truncated
 
 ### Backend and Database
-- RESTful API built with FastAPI
-- SQLite database integration
+- REST API built with FastAPI
+- SQLite persistence with foreign-key constraints and cascading deletion
 - Data validation using Pydantic
-- Database transactions and rollback handling
-- Automatic migration from legacy JSON data
-- Foreign key constraints and cascading deletion
+- Safe, one-time JSON migration that validates each record before insertion and logs rejected records
+- Unicode-aware name uniqueness and schema upgrade for existing databases
+- Single-query student/grade retrieval and a combined reporting endpoint
 
 ### Frontend
-- Web-based student management dashboard and grade reports
-- Shared competition ranking across dashboard and reports (1, 2, 2, 4)
-- Search and five sorting options without changing a student's rank
-- Shared grade/status badges and compact grade chips with full-list tooltips
-- Performance chart with status-based colors, a 0–20 scale, and a passing threshold
-- At-risk student summary with names
-- Responsive stacked student cards on screens below 768px
-- Automatic data refresh after create, edit, delete, and page navigation
-- Keyboard focus indicators and accessible form/table labels
+- Responsive dashboard and grade reports
+- Shared competition ranking across dashboard and reports
+- Search and sorting without changing a student's rank
+- Grade/status badges and compact grade chips with full-list tooltips
+- Accessible forms, table labels, keyboard focus indicators, and status messages
 
 ## Technology Stack
 
 | Area | Technologies |
 |---|---|
-| Programming Language | Python |
-| Backend | FastAPI |
+| Programming Language | Python 3.10+ |
+| Backend | FastAPI, Uvicorn |
 | Database | SQLite |
-| Data Validation | Pydantic |
+| Data Validation | Pydantic v2 |
 | Frontend | HTML, CSS, JavaScript |
-| Testing | Pytest, HTTPX |
-| Code Coverage | pytest-cov |
+| Testing | Pytest, HTTPX, pytest-cov |
 
 ## Project Structure
 
@@ -71,24 +61,25 @@ grade-manager/
 │   ├── database.py
 │   ├── main.py
 │   ├── models.py
-│   └── storage.py
+│   └── names.py
 ├── frontend/
-│   ├── css/
-│   │   └── style.css
+│   ├── css/style.css
 │   ├── js/
 │   │   ├── app.js
 │   │   └── students.js
 │   └── index.html
+├── scripts/
+│   ├── __init__.py
+│   └── restore_from_backup.py
 ├── tests/
 │   ├── test_api.py
 │   ├── test_calculations.py
 │   ├── test_database.py
 │   ├── test_models.py
-│   └── test_storage.py
+│   └── test_names.py
 ├── screenshots/
 ├── .gitignore
 ├── requirements.txt
-├── restore_stage5_data.py
 └── README.md
 ```
 
@@ -101,7 +92,7 @@ grade-manager/
 ![Grade Reports](screenshots/grade-reports.png)
 
 ### Performance Statistics
-![Performance](screenshots/performance.png)
+![Performance Statistics](screenshots/performance.png)
 
 ### Student Management
 ![Student Management](screenshots/student-management.png)
@@ -115,19 +106,19 @@ git clone https://github.com/Amirali-Modavi/grade-manager.git
 cd grade-manager
 ```
 
-### 2. Create a virtual environment
+### 2. Create and activate a virtual environment
 
 ```bash
 python -m venv venv
 ```
 
-Activate it on Windows:
+Windows PowerShell:
 
-```bash
-venv\Scripts\activate
+```powershell
+.\venv\Scripts\Activate.ps1
 ```
 
-On macOS and Linux:
+macOS and Linux:
 
 ```bash
 source venv/bin/activate
@@ -145,71 +136,56 @@ python -m pip install -r requirements.txt
 uvicorn backend.main:app --reload
 ```
 
-Open the application in your browser:
+Open the application at `http://127.0.0.1:8000`.
 
-```text
-http://127.0.0.1:8000
-```
-
-FastAPI interactive documentation:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-Alternative API documentation:
-
-```text
-http://127.0.0.1:8000/redoc
-```
+FastAPI documentation is available at `http://127.0.0.1:8000/docs` and `http://127.0.0.1:8000/redoc`.
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
 | GET | `/api/students` | Retrieve all students |
-| POST | `/api/students` | Create a new student |
+| POST | `/api/students` | Create a student |
 | PUT | `/api/students/{student_id}` | Update a student |
 | DELETE | `/api/students/{student_id}` | Delete a student |
+| GET | `/api/reports/overview` | Retrieve student reports and dashboard summary in one response |
 | GET | `/api/reports/students` | Retrieve student reports |
-| GET | `/api/reports/summary` | Retrieve class summary |
+| GET | `/api/reports/summary` | Retrieve the class summary and passing threshold |
 | GET | `/api/health` | Check API health |
 
 ## Testing
 
-The backend is tested using Pytest.
-
-Run the test suite:
+Run the complete test suite:
 
 ```bash
 python -m pytest -v
 ```
 
-Run tests with code coverage:
+Run tests with coverage:
 
 ```bash
 python -m pytest --cov=backend --cov-report=term-missing
 ```
 
-### Test Results
+Test totals and coverage depend on the current code and test environment; use the commands above for the latest results. Coverage reports executed statements and does not prove that every possible input or behavior has been tested.
 
-| Metric | Result |
-|---|---:|
-| Total Tests | 82 |
-| Passed Tests | 82 |
-| Failed Tests | 0 |
-| Backend Test Coverage | 100% |
-| Backend Statements Covered | 212 |
-| Uncovered Backend Statements | 0 |
+## Optional Data Recovery
 
-All 82 automated tests passed successfully, with 100% statement coverage across the backend modules.
+To import additional records from a local `students_backup.json` file, put that file in the project root and run:
 
-*Coverage represents executed backend statements and does not guarantee the absence of all possible bugs.*
+```bash
+python -m scripts.restore_from_backup
+```
+
+The utility creates a timestamped copy of the current SQLite database before importing. Existing IDs and normalized names are not overwritten. The backup file is intentionally excluded from Git because it may contain personal student data.
+
+## Security Note
+
+The application does not currently include authentication or role-based access. Run it locally or in a trusted environment; do not expose the write endpoints to an untrusted network without adding access control.
 
 ## Future Improvements
 
 - User authentication and role-based access
-- Improved data visualization
 - Exporting reports to PDF and Excel
 - Additional reporting and analytics features
 - Deployment to a production environment
