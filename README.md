@@ -64,6 +64,9 @@ During development, I used ChatGPT and Claude as supporting tools for code revie
 
 ```text
 grade-manager/
+├── .github/
+│   ├── workflows/
+│   │   ├── test.yml
 ├── backend/
 │   ├── routes/
 │   │   ├── __init__.py
